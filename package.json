@@ -8,6 +8,7 @@
     ]
   },
   "scripts": {
+    "build": "yarn workspace @se-2/nextjs build",
     "start": "yarn workspace @se-2/nextjs dev",
     "next:lint": "yarn workspace @se-2/nextjs lint",
     "next:format": "yarn workspace @se-2/nextjs format",
