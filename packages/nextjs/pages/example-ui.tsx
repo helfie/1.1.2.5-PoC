@@ -19,8 +19,8 @@ interface Errors {
 
 const TokenDetailsInput = () => {
   const [tokenDetails, setTokenDetails] = useState<TokenDetails>({
-    name: "",
-    symbol: "",
+    name: "Gold_test",
+    symbol: "GT",
     decimals: "18",
     ONCHAINID: zeroAddress,
     complianceModules: `${contracts[11155111][0].contracts.CountryAllowModule.address},${contracts[11155111][0].contracts.TimeTransferModule.address}`,
@@ -82,6 +82,11 @@ const TokenDetailsInput = () => {
   };
 
   const handleCopy = () => {
+    if (tokenDetails.complianceModules.split(",").length !== tokenDetails.complianceSettings.split(",").length) {
+      alert("complianceModules lenght must be equal to complianceSettings length");
+      return;
+    }
+
     if (Object.values(errors).some(error => error)) {
       alert("Please fix the errors before copying the tuple.");
       return;
@@ -143,6 +148,8 @@ const TokenDetailsInput = () => {
           <input
             type="number"
             name="decimals"
+            max={"18"}
+            min={"1"}
             value={tokenDetails.decimals}
             onChange={handleChange}
             className="mt-1 p-2 w-full border rounded-md"
@@ -171,6 +178,7 @@ const TokenDetailsInput = () => {
             className="mt-1 p-2 w-full border rounded-md"
             placeholder="0x1234...5678,0x1234...5678"
           ></textarea>
+          {errors.complianceModules && <p className="text-red-500 text-xs">{errors.complianceModules}</p>}
         </div>
         <div title="Settings calls for compliance modules">
           <div className="flex row items-center">
@@ -199,7 +207,9 @@ const TokenDetailsInput = () => {
                     alert("Failed to copy Country: " + err);
                   })
               }
-              className={`bg-blue-500 text-white p-2 rounded-md`}
+              className={`bg-blue-500 text-white p-2 rounded-md ${
+                Object.values(errors).some(error => error) ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
               Copy
             </button>
@@ -256,12 +266,15 @@ const TokenDetailsInput = () => {
             className="mt-1 p-2 w-full border rounded-md"
             placeholder="0x1234...5678,0x1234...5678"
           ></textarea>
+          {errors.complianceSettings && <p className="text-red-500 text-xs">{errors.complianceSettings}</p>}
         </div>
         <div className="mt-4">
           <button
             type="button"
             onClick={handleCopy}
-            className={`bg-blue-500 text-white p-2 rounded-md`}
+            className={`bg-blue-500 text-white p-2 rounded-md ${
+              Object.values(errors).some(error => error) ? "opacity-50 cursor-not-allowed" : ""
+            }`}
             disabled={Object.values(errors).some(error => error)}
           >
             Copy Generated Tuple
