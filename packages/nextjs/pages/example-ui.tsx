@@ -2,7 +2,7 @@ import React, { ChangeEvent, useState } from "react";
 import { encodeFunctionData, parseUnits, zeroAddress } from "viem";
 import { COUNTRY_ALLOW_ABI } from "~~/generated/abis/modules/country-allow.abi";
 import { TIME_TRANSFER_LIMIT_ABI } from "~~/generated/abis/modules/transfer-limit.abi";
-import contracts from '~~/generated/deployedContracts';
+import contracts from "~~/generated/deployedContracts";
 
 interface TokenDetails {
   name: string;
@@ -41,24 +41,20 @@ const TokenDetailsInput = () => {
   };
 
   const createModuleForCountry = () => {
-    const resEncoded = encodeFunctionData(
-      {
-        abi: COUNTRY_ALLOW_ABI,
-        functionName: 'batchAllowCountries',
-        args: [[Number(country)]]
-      }
-    )
+    const resEncoded = encodeFunctionData({
+      abi: COUNTRY_ALLOW_ABI,
+      functionName: "batchAllowCountries",
+      args: [[Number(country)]],
+    });
     return resEncoded;
   };
 
   const createModuleForTime = () => {
-    const resEncoded = encodeFunctionData(
-      {
-        abi: TIME_TRANSFER_LIMIT_ABI,
-        functionName: 'setTimeTransferLimit',
-        args: [{ limitTime: Number(time), limitValue: parseUnits(amount, Number(tokenDetails.decimals)) }]
-      }
-    );
+    const resEncoded = encodeFunctionData({
+      abi: TIME_TRANSFER_LIMIT_ABI,
+      functionName: "setTimeTransferLimit",
+      args: [{ limitTime: Number(time), limitValue: parseUnits(amount, Number(tokenDetails.decimals)) }],
+    });
     return resEncoded;
   };
 
@@ -184,23 +180,25 @@ const TokenDetailsInput = () => {
                 type="text"
                 name="Country"
                 value={country}
-                onChange={(e) => setCountry(e.target.value)}
+                onChange={e => setCountry(e.target.value)}
                 className="mt-1 p-2 w-full border rounded-md"
                 placeholder="267"
               />
             </div>
             <button
               type="button"
-              onClick={() => navigator.clipboard
-                .writeText(createModuleForCountry())
-                .then(() => {
-                  setTimeout(() => {
-                    alert("Country copied to clipboard!");
-                  }, 100);
-                })
-                .catch(err => {
-                  alert("Failed to copy Country: " + err);
-                })}
+              onClick={() =>
+                navigator.clipboard
+                  .writeText(createModuleForCountry())
+                  .then(() => {
+                    setTimeout(() => {
+                      alert("Country copied to clipboard!");
+                    }, 100);
+                  })
+                  .catch(err => {
+                    alert("Failed to copy Country: " + err);
+                  })
+              }
               className={`bg-blue-500 text-white p-2 rounded-md`}
             >
               Copy
@@ -213,7 +211,7 @@ const TokenDetailsInput = () => {
                 type="text"
                 name="Time is secs"
                 value={time}
-                onChange={(e) => setTime(e.target.value)}
+                onChange={e => setTime(e.target.value)}
                 className="mt-1 p-2 w-full border rounded-md"
                 placeholder="0x1234...5678"
               />
@@ -224,25 +222,28 @@ const TokenDetailsInput = () => {
                 type="text"
                 name="Amount"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={e => setAmount(e.target.value)}
                 className="mt-1 p-2 w-full border rounded-md"
                 placeholder="0x1234...5678"
               />
             </div>
             <button
               type="button"
-              onClick={() => navigator.clipboard
-                .writeText(createModuleForTime())
-                .then(() => {
-                  setTimeout(() => {
-                    alert("Time limit copied to clipboard!");
-                  }, 100);
-                })
-                .catch(err => {
-                  alert("Failed to copy Time limit: " + err);
-                })}
-              className={`bg-blue-500 text-white p-2 rounded-md ${Object.values(errors).some(error => error) ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+              onClick={() =>
+                navigator.clipboard
+                  .writeText(createModuleForTime())
+                  .then(() => {
+                    setTimeout(() => {
+                      alert("Time limit copied to clipboard!");
+                    }, 100);
+                  })
+                  .catch(err => {
+                    alert("Failed to copy Time limit: " + err);
+                  })
+              }
+              className={`bg-blue-500 text-white p-2 rounded-md ${
+                Object.values(errors).some(error => error) ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
               Copy
             </button>
