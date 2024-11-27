@@ -1,4 +1,8 @@
 import React, { ChangeEvent, useState } from "react";
+import { encodeFunctionData, parseUnits, zeroAddress } from "viem";
+import { COUNTRY_ALLOW_ABI } from "~~/generated/abis/modules/country-allow.abi";
+import { TIME_TRANSFER_LIMIT_ABI } from "~~/generated/abis/modules/transfer-limit.abi";
+import contracts from '~~/generated/deployedContracts';
 
 interface TokenDetails {
   name: string;
@@ -17,11 +21,14 @@ const TokenDetailsInput = () => {
   const [tokenDetails, setTokenDetails] = useState<TokenDetails>({
     name: "",
     symbol: "",
-    decimals: "",
-    ONCHAINID: "",
-    complianceModules: "",
-    complianceSettings: "",
+    decimals: "18",
+    ONCHAINID: zeroAddress,
+    complianceModules: `${contracts[11155111][0].contracts.CountryAllowModule.address},${contracts[11155111][0].contracts.TimeTransferModule.address}`,
+    complianceSettings: ``,
   });
+  const [country, setCountry] = useState("267");
+  const [time, setTime] = useState("86400");
+  const [amount, setAmount] = useState("1000");
   const [errors, setErrors] = useState<Errors>({});
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -31,6 +38,28 @@ const TokenDetailsInput = () => {
       [name]: value,
     }));
     validateField(name, value);
+  };
+
+  const createModuleForCountry = () => {
+    const resEncoded = encodeFunctionData(
+      {
+        abi: COUNTRY_ALLOW_ABI,
+        functionName: 'batchAllowCountries',
+        args: [[Number(country)]]
+      }
+    )
+    return resEncoded;
+  };
+
+  const createModuleForTime = () => {
+    const resEncoded = encodeFunctionData(
+      {
+        abi: TIME_TRANSFER_LIMIT_ABI,
+        functionName: 'setTimeTransferLimit',
+        args: [{ limitTime: Number(time), limitValue: parseUnits(amount, Number(tokenDetails.decimals)) }]
+      }
+    );
+    return resEncoded;
   };
 
   const validateField = (name: string, value: string) => {
@@ -44,6 +73,10 @@ const TokenDetailsInput = () => {
       } else if (!/^[a-zA-Z0-9\s\-_]+$/.test(value)) {
         error =
           "Name contains invalid characters. Only alphanumeric characters, spaces, hyphens, and underscores are allowed.";
+      }
+    } else if (name === "decimals") {
+      if (Number(value) < 1 || Number(value) > 18) {
+        error = "Decimals should be >= 1 && <= 18.";
       }
     }
     setErrors(prevErrors => ({
@@ -144,6 +177,76 @@ const TokenDetailsInput = () => {
           ></textarea>
         </div>
         <div title="Settings calls for compliance modules">
+          <div className="flex row items-center">
+            <div className="flex row items-center p-2 w-full">
+              <label className="block text-sm font-medium m-1 p-2">Country:</label>
+              <input
+                type="text"
+                name="Country"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                className="mt-1 p-2 w-full border rounded-md"
+                placeholder="267"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => navigator.clipboard
+                .writeText(createModuleForCountry())
+                .then(() => {
+                  setTimeout(() => {
+                    alert("Country copied to clipboard!");
+                  }, 100);
+                })
+                .catch(err => {
+                  alert("Failed to copy Country: " + err);
+                })}
+              className={`bg-blue-500 text-white p-2 rounded-md`}
+            >
+              Copy
+            </button>
+          </div>
+          <div className="flex column items-center">
+            <div className="flex row items-center w-2/4 p-2">
+              <label className="block text-sm font-medium m-1 p-1">Time:</label>
+              <input
+                type="text"
+                name="Time is secs"
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+                className="mt-1 p-2 w-full border rounded-md"
+                placeholder="0x1234...5678"
+              />
+            </div>
+            <div className="flex row items-center w-2/4 p-2">
+              <label className="block text-sm font-medium m-1">Limit Amount:</label>
+              <input
+                type="text"
+                name="Amount"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="mt-1 p-2 w-full border rounded-md"
+                placeholder="0x1234...5678"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => navigator.clipboard
+                .writeText(createModuleForTime())
+                .then(() => {
+                  setTimeout(() => {
+                    alert("Time limit copied to clipboard!");
+                  }, 100);
+                })
+                .catch(err => {
+                  alert("Failed to copy Time limit: " + err);
+                })}
+              className={`bg-blue-500 text-white p-2 rounded-md ${Object.values(errors).some(error => error) ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+            >
+              Copy
+            </button>
+          </div>
           <label className="block text-sm font-medium">Compliance Settings (Bytes[] - comma separated):</label>
           <textarea
             name="complianceSettings"
@@ -157,9 +260,7 @@ const TokenDetailsInput = () => {
           <button
             type="button"
             onClick={handleCopy}
-            className={`bg-blue-500 text-white p-2 rounded-md ${
-              Object.values(errors).some(error => error) ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            className={`bg-blue-500 text-white p-2 rounded-md`}
             disabled={Object.values(errors).some(error => error)}
           >
             Copy Generated Tuple
