@@ -22,7 +22,6 @@ const SignatureInput = () => {
   });
   const [sign, setSign] = useState("");
   const [userAddress, setUserAddress] = useState("");
-  const [hash, setHash] = useState("");
   const [errors, setErrors] = useState<Errors>({});
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -92,7 +91,7 @@ const SignatureInput = () => {
           <label className="block text-sm font-medium">Data (Bytes32):</label>
           <input
             type="text"
-            name="Data"
+            name="data"
             value={sigData.data}
             onChange={handleChange}
             maxLength={66}
@@ -132,16 +131,15 @@ const SignatureInput = () => {
           value={userAddress}
           onChange={e => {
             setUserAddress(e.target.value);
-            setHash(keccak256(pad(userAddress as Hex)));
           }}
           className="mt-1 p-2 w-full border rounded-md"
           placeholder="User Address"
           maxLength={42} // Assuming a max length of 100 for token name
           required
         />
-        {hash !== "" && (
+        {userAddress !== "" && (
           <div title="Hash">
-            <label className="block text-sm font-medium">Hash: {hash}</label>
+            <label className="block text-sm font-medium">Hash: {keccak256(pad(userAddress as Hex))}</label>
           </div>
         )}
       </div>
