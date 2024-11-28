@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useState } from "react";
-import { Hex } from "viem";
+import { Hex, keccak256, pad } from "viem";
 import { Address, useSignMessage } from "wagmi";
 import { claimSignature } from "~~/services/functions";
 
@@ -21,6 +21,8 @@ const SignatureInput = () => {
     data: "0xcc9c9d3152dfde3a20d686133ac95c58bdd254b7c4df8763800abe6ab669e19c",
   });
   const [sign, setSign] = useState("");
+  const [userAddress, setUserAddress] = useState("");
+  const [hash, setHash] = useState("");
   const [errors, setErrors] = useState<Errors>({});
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -68,7 +70,7 @@ const SignatureInput = () => {
             onChange={handleChange}
             className="mt-1 p-2 w-full border rounded-md"
             placeholder="Identity Address"
-            maxLength={43} // Assuming a max length of 100 for token name
+            maxLength={42} // Assuming a max length of 100 for token name
             required
           />
           {errors.identityAddress && <p className="text-red-500 text-xs">{errors.identityAddress}</p>}
@@ -120,6 +122,29 @@ const SignatureInput = () => {
           </button>
         </div>
       </form>
+
+      <h2 className="text-2xl mb-4">Identity User Address Hashed</h2>
+      <div title="Identity User Address Hashed">
+        <label className="block text-sm font-medium">User Address (String):</label>
+        <input
+          type="text"
+          name="userAddress"
+          value={userAddress}
+          onChange={e => {
+            setUserAddress(e.target.value);
+            setHash(keccak256(pad(userAddress as Hex)));
+          }}
+          className="mt-1 p-2 w-full border rounded-md"
+          placeholder="User Address"
+          maxLength={42} // Assuming a max length of 100 for token name
+          required
+        />
+        {hash !== "" && (
+          <div title="Hash">
+            <label className="block text-sm font-medium">Hash: {hash}</label>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
