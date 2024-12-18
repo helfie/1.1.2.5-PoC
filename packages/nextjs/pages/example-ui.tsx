@@ -233,14 +233,14 @@ const TokenDetailsInput = () => {
           </div>
           <div className="flex column items-center">
             <div className="flex row items-center w-2/4 p-2">
-              <label className="block text-sm font-medium m-1 p-1">Time:</label>
+              <label className="block text-sm font-medium m-1 p-1">Time (secs):</label>
               <input
                 type="text"
                 name="Time is secs"
                 value={time}
                 onChange={e => setTime(e.target.value)}
                 className="mt-1 p-2 w-full border rounded-md"
-                placeholder="0x1234...5678"
+                placeholder="86400"
               />
             </div>
             <div className="flex row items-center w-2/4 p-2">
@@ -251,7 +251,7 @@ const TokenDetailsInput = () => {
                 value={amount}
                 onChange={e => setAmount(e.target.value)}
                 className="mt-1 p-2 w-full border rounded-md"
-                placeholder="0x1234...5678"
+                placeholder="123"
               />
             </div>
             <button
