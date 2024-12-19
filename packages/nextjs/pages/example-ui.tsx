@@ -5,6 +5,7 @@ import { IR_ABI } from "~~/generated/abis/ir.abi";
 import { COUNTRY_ALLOW_ABI } from "~~/generated/abis/modules/country-allow.abi";
 import { TIME_TRANSFER_LIMIT_ABI } from "~~/generated/abis/modules/transfer-limit.abi";
 import contracts from "~~/generated/deployedContracts";
+import { COUNTRIES } from "~~/utils/countries";
 
 interface TokenDetails {
   name: string;
@@ -37,7 +38,10 @@ const TokenDetailsInput = () => {
   const [errors, setErrors] = useState<Errors>({});
 
   const getSenderCountry = async () => {
-    const country = await publicClient.readContract({
+    if (!address) {
+      return 380;
+    }
+    const country = await publicClient?.readContract({
       abi: IR_ABI,
       address: contracts[11155111][0].contracts.IdentityRegistry.address,
       functionName: "investorCountry",
@@ -200,14 +204,23 @@ const TokenDetailsInput = () => {
           <div className="flex row items-center">
             <div className="flex row items-center p-2 w-full">
               <label className="block text-sm font-medium m-1 p-2">Country:</label>
-              <input
-                type="text"
-                name="Country"
-                value={country}
-                onChange={e => setCountry(e.target.value)}
-                className="mt-1 p-2 w-full border rounded-md"
-                placeholder="267"
-              />
+              <select
+                className="p-2 w-full"
+                placeholder="Country"
+                onChange={e => {
+                  if (e.target.value !== "") {
+                    setCountry(e.target.value);
+                  }
+                }}
+              >
+                {COUNTRIES.map((element: any) => {
+                  return (
+                    <option key={element.name} value={element.code.toString()}>
+                      {element.name}
+                    </option>
+                  );
+                })}
+              </select>
             </div>
             <button
               type="button"
